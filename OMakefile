@@ -1,0 +1,17 @@
+OCAML_LIBS = $(OCAML_LIBS_aws-ml-api)
+
+FILES[] =
+  aws_ml_api_t
+  aws_ml_api_j
+  aws_ml_api_v
+  aws_ml_api
+
+Atdgen(aws_ml_api, -j-std)
+OCamlLibrary(aws-ml-api, $(FILES))
+Meta(aws-ml-api)
+
+.DEFAULT: META aws-ml-api.cma aws-ml-api.cmxa
+
+.PHONY: clean
+clean:
+  rm -f *.o *.a *.cm* *~ *.annot *.run *.opt META $(ATDGEN_OUTFILES)
