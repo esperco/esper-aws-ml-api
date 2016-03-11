@@ -36,3 +36,27 @@ type data_schema = {
   data_file_contains_header <json name="dataFileContainsHeader">: bool;
   attributes: attribute list;
 }
+
+type splitting_strategy = [
+  | Sequential <json name="sequential">
+  | Random <json name="random">
+]
+
+type s3_url = string
+
+type splitting = {
+  ~percent_begin <json name="percentBegin">
+                 <ocaml default="0">: int;
+  ~percent_end <json name="percentEnd">
+               <ocaml default="100">: int;
+  ~complement: bool;
+  ?strategy: splitting_strategy option;
+  ?random_seed: s3_url option;
+}
+
+(*
+  http://docs.aws.amazon.com/machine-learning/latest/dg/data-rearrangement.html
+*)
+type data_rearrangement = {
+  splitting: splitting;
+}
