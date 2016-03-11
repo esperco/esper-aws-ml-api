@@ -1,12 +1,15 @@
 OCAML_LIBS = $(OCAML_LIBS_aws-ml-api)
 
 FILES[] =
+  aws_ml_meta_t
+  aws_ml_meta_j
+  aws_ml_meta_v
   aws_ml_api_t
   aws_ml_api_j
   aws_ml_api_v
   aws_ml_api
 
-Atdgen(aws_ml_api, -j-std)
+Atdgen(aws_ml_meta aws_ml_api, -j-std)
 OCamlLibrary(aws-ml-api, $(FILES))
 Meta(aws-ml-api)
 

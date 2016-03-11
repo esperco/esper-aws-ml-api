@@ -1,0 +1,406 @@
+(*
+   Types corresponding to JSON data involved in the requests and responses
+   of the Amazon Machine Learning API.
+*)
+
+type timestamp = float wrap <ocaml module="Util_time.As_unixtime">
+
+type generic_status = [
+  | PENDING
+  | INPROGRESS
+  | FAILED
+  | COMPLETED
+  | DELETED
+]
+
+(*
+   A page of results returned any one of the Describe* calls.
+*)
+type 'a page = {
+  next_token <json repr="NextToken">: string;
+  results <json repr="Results">: 'a list;
+}
+
+type data_schema_escaped =
+  string wrap <ocaml t="Aws_ml_meta_t.data_schema"
+                     wrap="Aws_ml_meta_j.data_schema_of_string"
+                     unwrap="Aws_ml_meta_j.string_of_data_schema">
+
+type database_credentials = {
+  password <json repr="Password">: string;
+  username <json repr="Username">: string;
+}
+
+type s3_data_spec = {
+  data_location_s3 <json repr="DataLocationS3">: string;
+  data_rearrangement <json repr="DataRearrangement">: string;
+  data_schema <json repr="DataSchema">: data_schema_escaped;
+  data_schema_location_s3 <json repr="DataSchemaLocationS3">: string;
+}
+
+type create_data_source_from_s3_req = {
+  compute_statistics <json repr="ComputeStatistics">: bool;
+  data_source_id <json repr="DataSourceId">: string;
+  data_source_name <json repr="DataSourceName">: string;
+  data_spec <json repr="DataSpec">: s3_data_spec;
+}
+
+type create_data_source_from_s3_resp = {
+  data_source_id <json repr="DataSourceId">: string
+}
+
+type rds_database_credentials = database_credentials
+
+type rds_database = {
+  database_name <json repr="DatabaseName">: string;
+  instance_identifier <json repr="InstanceIdentifier">: string;
+}
+
+type rds_data_spec = {
+  data_rearrangement <json repr="DataRearrangement">: string;
+  data_schema <json repr="DataSchema">: string;
+  data_schema_uri <json repr="DataSchemaUri">: string;
+  database_credentials <json repr="DatabaseCredentials">:
+                                  rds_database_credentials;
+  database_information <json repr="DatabaseInformation">: rds_database;
+  resource_role <json repr="ResourceRole">: string;
+  s3_staging_location <json repr="S3StagingLocation">: string;
+  security_group_ids <json repr="SecurityGroupIds">: string list;
+  select_sql_query <json repr="SelectSqlQuery">: string;
+  service_role <json repr="ServiceRole">: string;
+  subnet_id <json repr="SubnetId">: string;
+}
+
+type create_data_source_from_rds_req = {
+  compute_statistics <json repr="ComputeStatistics">: bool;
+  data_source_id <json repr="DataSourceId">: string;
+  data_source_name <json repr="DataSourceName">: string;
+  rds_data <json repr="RDSData">: rds_data_spec;
+  role_arn <json repr="RoleARN">: string
+}
+
+type data_source_id_obj = {
+  data_source_id <json repr="DataSourceId">: string
+}
+
+type create_data_source_from_rds_resp = data_source_id_obj
+
+type redshift_database_credentials = database_credentials
+
+type redshift_database = {
+  cluster_identifier <json repr="ClusterIdentifier">: string;
+  database_name <json repr="DatabaseName">: string
+}
+
+type redshift_data_spec = {
+  data_rearrangement <json repr="DataRearrangement">: string;
+  data_schema <json repr="DataSchema">: string;
+  data_schema_uri <json repr="DataSchemaUri">: string;
+  database_credentials <json repr="DatabaseCredentials">:
+                                  redshift_database_credentials;
+  database_information <json repr="DatabaseInformation">: redshift_database;
+  s3_staging_location <json repr="S3StagingLocation">: string;
+  select_sql_query <json repr="SelectSqlQuery">: string;
+}
+
+type create_data_source_from_redshift_req = {
+  compute_statistics <json repr="ComputeStatistics">: bool;
+  data_source_id <json repr="DataSourceId">: string;
+  data_source_name <json repr="DataSourceName">: string;
+  data_spec <json repr="DataSpec">: redshift_data_spec;
+  role_arn <json repr="RoleARN">: string
+}
+
+type create_data_source_from_redshift_resp = data_source_id_obj
+
+type get_data_source_req = {
+  data_source_id <json repr="DataSourceId">: string;
+  verbose <json repr="Verbose">: bool;
+}
+
+type rds_metadata = {
+  data_pipeline_id <json repr="DataPipelineId">: string;
+  database <json repr="Database">: rds_database;
+  database_user_name <json repr="DatabaseUserName">: string;
+  resource_role <json repr="ResourceRole">: string;
+  select_sql_query <json repr="SelectSqlQuery">: string;
+  service_role <json repr="ServiceRole">: string
+}
+
+type redshift_metadata = {
+  database_user_name <json repr="DatabaseUserName">: string;
+  redshift_database <json repr="RedshiftDatabase">: redshift_database;
+  select_sql_query <json repr="SelectSqlQuery">: string;
+}
+
+type data_source_status = generic_status
+
+type data_source = {
+  compute_statistics <json repr="ComputeStatistics">: bool;
+  created_at <json repr="CreatedAt">: timestamp;
+  created_by_iam_user <json repr="CreatedByIamUser">: string;
+  data_location_s3 <json repr="DataLocationS3">: string;
+  data_rearrangement <json repr="DataRearrangement">: string;
+  data_size_in_bytes <json repr="DataSizeInBytes">: int;
+  data_source_id <json repr="DataSourceId">: string;
+  data_source_schema <json repr="DataSourceSchema">: string;
+  last_updated_at <json repr="LastUpdatedAt">: timestamp;
+  log_uri <json repr="LogUri">: string;
+  message <json repr="Message">: string;
+  name <json repr="Name">: string;
+  number_of_files <json repr="NumberOfFiles">: int;
+  rds_metadata <json repr="RDSMetadata">: rds_metadata;
+  redshift_metadata <json repr="RedshiftMetadata">: redshift_metadata;
+  role_arn <json repr="RoleARN">: string;
+  ?status <json repr="Status">: data_source_status option;
+}
+
+type get_data_source_resp = data_source
+
+type update_data_source_req = {
+  data_source_id <json repr="DataSourceId">: string;
+  data_source_name <json repr="DataSourceName">: string;
+}
+
+type update_data_source_resp = data_source_id_obj
+
+type describe_req = {
+  eq <json repr="EQ">: string;
+  filter_variable <json repr="FilterVariable">: string;
+  ge <json repr="GE">: string;
+  gt <json repr="GT">: string;
+  le <json repr="LE">: string;
+  limit <json repr="Limit">: float;
+  lt <json repr="LT">: string;
+  ne <json repr="NE">: string;
+  next_token <json repr="NextToken">: string;
+  prefix <json repr="Prefix">: string;
+  sort_order <json repr="SortOrder">: string;
+}
+
+type describe_data_sources_req = describe_req
+
+type describe_data_sources_resp = data_source page
+
+type delete_data_source_req = data_source_id_obj
+
+type delete_data_source_resp = data_source_id_obj
+
+type create_ml_model_req = {
+  ml_model_id <json repr="MLModelId">: string;
+  ml_model_name <json repr="MLModelName">: string;
+  ml_model_type <json repr="MLModelType">: string;
+  parameters <json repr="Parameters">:
+    (string * string) list <json repr="object">;
+  recipe <json repr="Recipe">: string;
+  recipe_uri <json repr="RecipeUri">: string;
+  training_data_source_id <json repr="TrainingDataSourceId">: string;
+}
+
+type realtime_endpoint_status = [
+  | NONE
+  | READY
+  | UPDATING
+  | FAILED
+]
+
+type realtime_endpoint_info = {
+  ?created_at <json repr="CreatedAt">: timestamp option;
+  ?endpoint_status <json repr="EndpointStatus">:
+                              realtime_endpoint_status option;
+  ?endpoint_url <json repr="EndpointUrl">: string option;
+  ?peak_requests_per_second <json repr="PeakRequestsPerSecond">: float option;
+}
+
+type ml_model_status = generic_status
+
+type ml_model = {
+  created_at <json repr="CreatedAt">: timestamp;
+  created_by_iam_user <json repr="CreatedByIamUser">: string;
+  endpoint_info <json repr="EndpointInfo">: realtime_endpoint_info;
+  input_data_location_s3 <json repr="InputDataLocationS3">: string;
+  last_updated_at <json repr="LastUpdatedAt">: timestamp;
+  log_uri <json repr="LogUri">: string;
+  message <json repr="Message">: string;
+  ml_model_id <json repr="MLModelId">: string;
+  ml_model_type <json repr="MLModelType">: string;
+  name <json repr="Name">: string;
+  recipe <json repr="Recipe">: string;
+  schema <json repr="Schema">: string;
+  score_threshold <json repr="ScoreThreshold">: float;
+  score_threshold_last_updated_at <json repr="ScoreThresholdLastUpdatedAt">:
+                                             timestamp;
+  size_in_bytes <json repr="SizeInBytes">: int;
+  status <json repr="Status">: ml_model_status;
+  training_data_source_id <json repr="TrainingDataSourceId">: string;
+  training_parameters <json repr="TrainingParameters">:
+    (string * string) list <json repr="object">
+}
+
+type ml_model_id_obj = {
+  ml_model_id <json repr="MLModelId">: string
+}
+
+type create_ml_model_resp = ml_model_id_obj
+
+type get_ml_model_req = {
+  ml_model_id <json repr="MLModelId">: string;
+  verbose <json repr="Verbose">: bool
+}
+
+type get_ml_model_resp = ml_model
+
+type update_ml_model_req = {
+  ml_model_id <json repr="MLModelId">: string;
+  ml_model_name <json repr="MLModelName">: string;
+  score_threshold <json repr="ScoreThreshold">: float
+}
+
+type update_ml_model_resp = ml_model_id_obj
+
+type describe_ml_models_req = describe_req
+
+type describe_ml_models_resp = ml_model page
+
+type delete_ml_model_req = ml_model_id_obj
+
+type delete_ml_model_resp = ml_model_id_obj
+
+type create_evaluation_req = {
+  evaluation_data_source_id <json repr="EvaluationDataSourceId">: string;
+  evaluation_id <json repr="EvaluationId">: string;
+  evaluation_name <json repr="EvaluationName">: string;
+  ml_model_id <json repr="MLModelId">: string
+}
+
+type evaluation_id_obj = {
+  evaluation_id <json repr="EvaluationId">: string
+}
+
+type create_evaluation_resp = evaluation_id_obj
+
+type get_evaluation_req = evaluation_id_obj
+
+type performance_metrics = {
+  properties <json repr="Properties">: (string * string) <json repr="object">
+}
+
+type evaluation_status = generic_status
+
+type evaluation = {
+  created_at <json repr="CreatedAt">: timestamp;
+  created_by_iam_user <json repr="CreatedByIamUser">: string;
+  evaluation_data_source_id <json repr="EvaluationDataSourceId">: string;
+  evaluation_id <json repr="EvaluationId">: string;
+  input_data_location_s3 <json repr="InputDataLocationS3">: string;
+  last_updated_at <json repr="LastUpdatedAt">: timestamp;
+  log_uri <json repr="LogUri">: string;
+  message <json repr="Message">: string;
+  ml_model_id <json repr="MLModelId">: string;
+  name <json repr="Name">: string;
+  performance_metrics <json repr="PerformanceMetrics">: performance_metrics;
+  status <json repr="Status">: evaluation_status;
+}
+
+type get_evaluation_resp = evaluation
+
+type update_evaluation_req = {
+  evaluation_id <json repr="EvaluationId">: string;
+  evaluation_name <json repr="EvaluationName">: string;
+}
+
+type update_evaluation_resp = {
+  evaluation_id <json repr="EvaluationId">: string;
+}
+
+type describe_evaluations_req = describe_req
+
+type describe_evaluations_resp = evaluation page
+
+type delete_evaluation_req = evaluation_id_obj
+
+type delete_evaluation_resp = evaluation_id_obj
+
+type create_batch_prediction_req = {
+  batch_prediction_data_source_id <json repr="BatchPredictionDataSourceId">:
+                                             string;
+  batch_prediction_id <json repr="BatchPredictionId">: string;
+  batch_prediction_name <json repr="BatchPredictionName">: string;
+  ml_model_id <json repr="MLModelId">: string;
+  output_uri <json repr="OutputUri">: string;
+}
+
+type batch_prediction_id_obj = {
+  batch_prediction_id <json repr="BatchPredictionId">: string
+}
+
+type create_batch_prediction_resp = batch_prediction_id_obj
+
+type get_batch_prediction_req = batch_prediction_id_obj
+
+type batch_prediction_status = generic_status
+
+type batch_prediction = {
+  batch_prediction_data_source_id <json repr="BatchPredictionDataSourceId">:
+                                             string;
+  batch_prediction_id <json repr="BatchPredictionId">: string;
+  created_at <json repr="CreatedAt">: timestamp;
+  created_by_iam_user <json repr="CreatedByIamUser">: string;
+  input_data_location_s3 <json repr="InputDataLocationS3">: string;
+  last_updated_at <json repr="LastUpdatedAt">: timestamp;
+  log_uri <json repr="LogUri">: string;
+  message <json repr="Message">: string;
+  ml_model_id <json repr="MLModelId">: string;
+  name <json repr="Name">: string;
+  output_uri <json repr="OutputUri">: string;
+  status <json repr="Status">: batch_prediction_status;
+}
+
+type get_batch_prediction_resp = batch_prediction
+
+type update_batch_prediction_req = {
+  batch_prediction_id <json repr="BatchPredictionId">: string;
+  batch_prediction_name <json repr="BatchPredictionName">: string
+}
+
+type update_batch_prediction_resp = batch_prediction_id_obj
+
+type describe_batch_predictions_req = describe_req
+
+type describe_batch_predictions_resp = batch_prediction page
+
+type delete_batch_prediction_req = batch_prediction_id_obj
+
+type delete_batch_prediction_resp = batch_prediction_id_obj
+
+type create_realtime_endpoint_req = ml_model_id_obj
+
+type realtime_endpoint = {
+  ml_model_id <json repr="MLModelId">: string;
+  realtime_endpoint_info <json repr="RealtimeEndpointInfo">:
+                                    realtime_endpoint_info;
+}
+
+type create_realtime_endpoint_resp = realtime_endpoint
+
+type delete_realtime_endpoint_req = ml_model_id_obj
+
+type delete_realtime_endpoint_resp = realtime_endpoint
+
+type predict_req = {
+  ml_model_id <json repr="MLModelId">: string;
+  predict_endpoint <json repr="PredictEndpoint">: string;
+  record <json repr="Record">: (string * string) list <json repr="object">;
+}
+
+type prediction = {
+  details <json repr="Details">: (string * string) list <json repr="object">;
+  predicted_label <json repr="PredictedLabel">: string;
+  predicted_scores <json repr="PredictedScores">:
+                              (string * float) list <json repr="object">;
+  predicted_value <json repr="PredictedValue">: float;
+}
+
+type predict_resp = {
+  prediction <json repr="Prediction">: prediction;
+}

@@ -1,0 +1,38 @@
+(*
+   Types for JSON data that are serialized as JSON strings
+   embedded in a JSON document.
+
+   At this time (atdgen 1.8.0), we need to put these definitions
+   in a separate file to guarantee that the OCaml definition
+   of the type Aws_ml_api.data_schema_escaped comes after the
+   definition of data_schema.
+*)
+
+type attribute_type = [
+  | BINARY
+  | CATEGORICAL
+  | NUMERIC
+  | TEXT
+]
+
+type attribute = {
+  attribute_name <json name="attributeName">: string;
+  attributeType: attribute_type;
+}
+
+type data_format = [ CSV ] (* other choices? *)
+
+(*
+   Data schema, half-documented separately at
+   http://docs.aws.amazon.com/machine-learning/latest/dg/
+                              creating-a-data-schema-for-amazon-ml.html
+*)
+type data_schema = {
+  ~version <ocaml default="\"1.0\"">: string; (* version of what? *)
+  ?row_id <json name="rowId">: string option;
+  target_attribute_name <json name="targetAttributeName">: string;
+  ~data_format <json name="dataFormat">
+               <ocaml default="`CSV">: data_format;
+  data_file_contains_header <json name="dataFileContainsHeader">: bool;
+  attributes: attribute list;
+}
