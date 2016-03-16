@@ -25,7 +25,7 @@ let make_url_and_headers ~param ~action ~request_payload =
       ~secret_access_key: param.secret_access_key
       ~content_type: Aws_call.json_content_type
       ~target: ("AmazonML_20141212." ^ action)
-      ~http_request_method: "POST"
+      ~http_request_method: `POST
       ~host
       ~region
       ~service
