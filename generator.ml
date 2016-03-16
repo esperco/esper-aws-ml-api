@@ -68,16 +68,37 @@ let opt_%s param req =
     ocaml_ident aws_ident ocaml_ident ocaml_ident
     ocaml_ident aws_ident ocaml_ident ocaml_ident
 
+let generate_app_implementation (ocaml_ident, aws_ident) =
+  printf "\
+let %s req =
+  Cloudwatch.time \"aws.api.ml.%s\" (fun () ->
+    Aws_ml_api.%s (get_ml_param ()) req
+  )
+
+let opt_%s req =
+  Cloudwatch.time \"aws.api.ml.%s\" (fun () ->
+    Aws_ml_api.opt_%s (get_ml_param ()) req
+  )
+
+"
+    ocaml_ident ocaml_ident ocaml_ident
+    ocaml_ident ocaml_ident ocaml_ident
+
 let generate_mli () =
-  printf "(* mli *)\n\n";
+  printf "(* aws_ml_api.mli *)\n\n";
   List.iter generate_signature actions
 
 let generate_ml () =
-  printf "(* ml *)\n\n";
+  printf "(* aws_ml_api.ml *)\n\n";
   List.iter generate_implementation actions
+
+let generate_app_ml () =
+  printf "(* aws_ml.ml *)\n\n";
+  List.iter generate_app_implementation actions
 
 let main () =
   generate_mli ();
-  generate_ml ()
+  generate_ml ();
+  generate_app_ml ()
 
 let () = main ()
