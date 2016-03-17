@@ -17,7 +17,7 @@ type attribute_type = [
 
 type attribute = {
   attribute_name <json name="attributeName">: string;
-  attributeType: attribute_type;
+  attribute_type <json name="attributeType">: attribute_type;
 }
 
 type data_format = [ CSV ] (* other choices? *)
