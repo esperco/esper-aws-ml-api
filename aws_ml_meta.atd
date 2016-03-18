@@ -28,7 +28,7 @@ type data_format = [ CSV ] (* other choices? *)
                               creating-a-data-schema-for-amazon-ml.html
 *)
 type data_schema = {
-  ~version <ocaml default="\"1.0\"">: string; (* version of what? *)
+  version: string; (* "1.0" or something *)
   ?row_id <json name="rowId">: string option;
   target_attribute_name <json name="targetAttributeName">: string;
   ~data_format <json name="dataFormat">

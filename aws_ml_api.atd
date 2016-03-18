@@ -76,6 +76,7 @@ type s3_data_spec = {
 
 type create_data_source_from_s3_req = {
   ?compute_statistics <json name="ComputeStatistics">: bool option;
+     (* needs to be set true if used to train a model *)
   data_source_id <json name="DataSourceId">: string;
   ?data_source_name <json name="DataSourceName">: string option;
   data_spec <json name="DataSpec">: s3_data_spec;
@@ -110,6 +111,7 @@ type rds_data_spec = {
 
 type create_data_source_from_rds_req = {
   ?compute_statistics <json name="ComputeStatistics">: bool option;
+     (* needs to be set true if used to train a model *)
   data_source_id <json name="DataSourceId">: string;
   ?data_source_name <json name="DataSourceName">: string option;
   rds_data <json name="RDSData">: rds_data_spec;
@@ -143,6 +145,7 @@ type redshift_data_spec = {
 
 type create_data_source_from_redshift_req = {
   ?compute_statistics <json name="ComputeStatistics">: bool option;
+     (* needs to be set true if used to train a model *)
   data_source_id <json name="DataSourceId">: string;
   ?data_source_name <json name="DataSourceName">: string option;
   data_spec <json name="DataSpec">: redshift_data_spec;
@@ -261,7 +264,7 @@ type ml_model = {
   ?status <json name="Status">: ml_model_status option;
   ?training_data_source_id <json name="TrainingDataSourceId">: string option;
   ?training_parameters <json name="TrainingParameters">:
-    (string * string) list <json name="object"> option;
+    (string * string) list <json repr="object"> option;
 }
 
 type ml_model_id_obj = {
