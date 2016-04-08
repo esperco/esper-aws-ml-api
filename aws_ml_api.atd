@@ -3,6 +3,12 @@
    of the Amazon Machine Learning API.
 *)
 
+type error_response = {
+  type_ <json name="__type">: string;
+  code: int;
+  message: string;
+} <ocaml field_prefix="error_">
+
 type timestamp = float wrap <ocaml module="Util_time.As_unixtime">
 
 type generic_status = [

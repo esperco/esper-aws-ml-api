@@ -48,8 +48,14 @@ let opt_post param action req_to_string resp_of_string request =
   | `Not_found, _, _ ->
       return None
   | `Bad_request, _, body ->
-      logf `Error "Bad AWS ML request. Response body: %s" body;
-      failwith "Bad AWS request"
+      let x = Aws_ml_api_j.error_response_of_string body in
+      (match x.error_type_ with
+       | "ResourceNotFoundException" ->
+           return None
+       | _ ->
+           logf `Error "Bad AWS ML request. Response body: %s" body;
+           failwith "Bad AWS ML request"
+      )
   | err, _, body ->
       logf `Error "AWS ML call failed with error %d: %s\n%!"
         (Cohttp.Code.code_of_status err) body;
