@@ -36,7 +36,9 @@ let make_url_and_headers ~param ~action ~request_payload =
   in
   url, headers
 
-let opt_post param action req_to_string resp_of_string request =
+let rec opt_post
+    ?(delay_before_retrying = 1)
+    param action req_to_string resp_of_string request =
   let request_payload = req_to_string request in
   let url, headers = make_url_and_headers ~param ~action ~request_payload in
   Util_http_client.post
@@ -52,6 +54,14 @@ let opt_post param action req_to_string resp_of_string request =
       (match x.error_type_ with
        | "ResourceNotFoundException" ->
            return None
+       | "ThrottlingException" when delay_before_retrying <= 16 ->
+           logf `Warning
+             "ThrottlingException: Retrying AWS ML request in %i seconds"
+             delay_before_retrying;
+           Lwt_unix.sleep (float delay_before_retrying) >>= fun () ->
+           opt_post
+             ~delay_before_retrying: (2 * delay_before_retrying)
+             param action req_to_string resp_of_string request
        | _ ->
            logf `Error "Bad AWS ML request. Response body: %s" body;
            failwith "Bad AWS ML request"
