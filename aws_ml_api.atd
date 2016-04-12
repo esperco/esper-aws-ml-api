@@ -5,7 +5,7 @@
 
 type error_response = {
   type_ <json name="__type">: string;
-  code: int;
+  ?code: int option;
   message: string;
 } <ocaml field_prefix="error_">
 
