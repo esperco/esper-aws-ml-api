@@ -69,12 +69,17 @@ let rec opt_post
   | err, _, body ->
       logf `Error "AWS ML call failed with error %d: %s\n%!"
         (Cohttp.Code.code_of_status err) body;
-      Http_exn.service_unavailable "3rd-party service is unavailable"
+      Http_exn.service_unavailable
+        `Service_unavailable
+        "3rd-party service is unavailable"
 
 let post param action req_to_string resp_of_string request =
   opt_post param action req_to_string resp_of_string request >>= function
   | Some x -> return x
-  | None -> Http_exn.not_found "AWS ML resource not found"
+  | None ->
+      Http_exn.not_found
+        `Not_found
+        "AWS ML resource not found"
 
 (* Originally generated using `ocaml generator.ml` *)
 
