@@ -8,4 +8,8 @@ It won't build as is but most of the code was used in production.
 Description
 -----------
 
-Sorry, no description yet :cry:
+OCaml/Lwt client for the Amazon Machine Learning API.
+
+Depends on https://github.com/esperco/esper-aws-common
+(request authentication) and on 
+https://github.com/esperco/esper-aws-s3 (data storage).
